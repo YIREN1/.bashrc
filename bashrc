@@ -49,17 +49,20 @@ alias mv="mv -i"
 alias cp="cp -i"
 
 COLOR_RED="\033[0;31m"
+BACK_COLOR_RED="\033[41m"
 COLOR_YELLOW="\033[0;33m"
+BACK_COLOR_YELLOW="\033[43m"
 COLOR_GREEN="\033[0;32m"
+BACK_COLOR_GREEN="\033[42m"
 COLOR_OCHRE="\033[38;5;95m"
+BACK_COLOR_OCHRE="\033[48m"
 COLOR_BLUE="\033[0;34m"
 COLOR_WHITE="\033[0;37m"
 COLOR_RESET="\033[0m"
-
 function git_color {
   local git_status="$(git status 2> /dev/null)"
 
-  if [[ ! $git_status =~ "working directory clean" ]]; then
+  if [[ ! $git_status =~ "working tree clean" ]]; then
     echo -e $COLOR_RED
   elif [[ $git_status =~ "Your branch is ahead of" ]]; then
     echo -e $COLOR_YELLOW
@@ -70,12 +73,29 @@ function git_color {
   fi
 }
 
-PS1="\[\033[01;36m\]\u in \[\033[93m\]\W\[\033[32m\]$"2
-PS1+="\[\$(git_color)\]"
-PS1+="\$(parse_git_branch) \[\033[01;36m\]"
-PS1+="\${CORE_PROJECT_NAME} "
-PS1+="\[$COLOR_BLUE\]\$\[$COLOR_RESET\] "   # '#' for root, else '$'
+function git_back_color {
+  local git_status="$(git status 2> /dev/null)"
+
+  if [[ ! $git_status =~ "working tree clean" ]]; then
+    echo -e $BACK_COLOR_RED
+  elif [[ $git_status =~ "Your branch is ahead of" ]]; then
+    echo -e $BACK_COLOR_YELLOW
+  elif [[ $git_status =~ "nothing to commit" ]]; then
+    echo -e $BACK_COLOR_GREEN
+  else
+    echo -e $BACK_COLOR_OCHRE
+  fi
+}
+
+PS1="\[\033[36m\]ubuntu\[\033[m\]:\[\033[44m\]\[\033[8;30m\]\[\033[1;33m\]\w$"2
+PS1+="\[\$(git_back_color)\]\[\033[34m\]\[\$(git_back_color)\]"
+PS1+="\[\033[30m\]\$(parse_git_branch)\[\033[0;m\]\[\$(git_color)\]"
+PS1+="\[\033[m\] [\[$(tput sgr0)\]\[\033[38;5;213m\]\A\[$(tput sgr0)\]\[\033[38;5;15m\]]"
+PS1+="\n"
+PS1+="\[$COLOR_BLUE\]\$\[$COLOR_RESET\]"
+PS1+=" 🔥  🏀  😈  "
 export PS1
+#export PS1=" 🇨🇳  😎 📡  "
 
 function goincontainer() {
     docker exec -it ${CORE_PROJECT_NAME}_$1_1 /bin/bash
